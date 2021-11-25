@@ -6,15 +6,18 @@ Set starting working directory:
     WORKDIR /usr/src/
 
 
-Install Boost:
+Install all required packages including Boost:
 
-    RUN wget -O boost_1_63_0.tar.gz https://sourceforge.net/projects/boost/files/boost/  1.63.0/boost_1_63_0.tar.gz/download
-    RUN tar xzvf boost_1_63_0.tar.gz
-    RUN mv boost_1_63_0 /usr/local/bin
+    RUN apt-get update && apt-get install -y --no-install-recommends\
+      wget \
+      git \ 
+      vim g++ make \
+      && wget -O boost_1_63_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz/download \
+      && tar xzvf boost_1_63_0.tar.gz \
+      && mv boost_1_63_0 /usr/local/bin \
+      && git clone https://github.com/facebookresearch/Starspace.git
 
-Clone Starspace
-
-    RUN git clone https://github.com/facebookresearch/Starspace.git
+Run Starspace makefile
 
     WORKDIR /usr/src/Starspace
     RUN make
@@ -28,8 +31,8 @@ Create non-root user
     ARG USER_ID	
     ARG GROUP_ID
 
-    RUN addgroup --gid $GROUP_ID user
-    RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+    RUN addgroup --gid $GROUP_ID user \
+    && dduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
     USER user 
 
 Run starspace training
