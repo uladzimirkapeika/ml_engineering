@@ -10,7 +10,8 @@ jobs:
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd data_governance
+          cd data_governance_hw
+          pwd
           pip install -r requirements.txt
           pytest tests.py
           dvc repro
