@@ -4,3 +4,4 @@ nltk
 seaborn
 numpy
 matplotlib
+pytest
