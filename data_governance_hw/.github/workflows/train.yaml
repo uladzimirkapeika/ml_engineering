@@ -1,0 +1,25 @@
+name: data_governance
+on: [push]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: iterative/setup-cml@v1
+      - name: Train model
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip install -r requirements.txt
+          pytest tests.py --disable warnings
+
+          dvc repro
+
+          git fetch --prune
+          dvc metrics diff --show-md
+
+          echo "##Model validation"
+          cat metrics.json >> report.md
+          cml-publish permutate_feature_importance_top_10.png --md >> report.md
+          cml-send-comment report.md
