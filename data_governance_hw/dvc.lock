@@ -1,0 +1,28 @@
+schema: '2.0'
+stages:
+  process:
+    cmd: python3 process_data.py
+    deps:
+    - path: process_data.py
+      md5: 36e89eb313b0d9ea083c5e5c75fe8593
+      size: 781
+    outs:
+    - path: data_processed_train.csv
+      md5: 48dbc855111bc3803df8bf1fc0bd486e
+      size: 842997
+  train:
+    cmd: python3 train.py
+    deps:
+    - path: data_processed_train.csv
+      md5: 48dbc855111bc3803df8bf1fc0bd486e
+      size: 842997
+    - path: train.py
+      md5: 32ac9e5d9347ee4f45131ca131319d85
+      size: 2440
+    outs:
+    - path: metrics.json
+      md5: 948d62740a5abdccd8649663bac85f7e
+      size: 102
+    - path: permutate_feature_importance_top_10.png
+      md5: 285f6816f540b0f79b19d45f12b2984f
+      size: 5752
