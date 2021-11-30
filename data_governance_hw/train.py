@@ -11,7 +11,7 @@ from matplotlib import pyplot
 
 
 vectorizer_params = {
-    "max_features": 150,
+    "max_features": 200,
     #"max_features": None,
     #"ngram_range": (1, 2),
     #"min_df": 0,
