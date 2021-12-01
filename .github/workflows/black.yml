@@ -8,10 +8,15 @@ jobs:
         with:  # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
             ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v1
-      - run: |
-          pip install black
-          pip install pylint
-      - name: If needed, commit black changes to a new pull request
+      - name: Install Black
+        run: pip install black
+      - name: Install Pylint
+        run: pip install pylint
+      - name: Run Pylint
+        runt: pylint .
+      - name: Run black --check .
+        run: black --check .
+      - name: If needed, commit black changes to the pull request
         if: failure()
         run: |
           pylint .

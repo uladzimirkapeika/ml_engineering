@@ -10,7 +10,7 @@ from matplotlib import pyplot
 
 
 vectorizer_params = {
-    "max_features": 220,
+    "max_features": 300,
     # "max_features": None,
     # "ngram_range": (1, 2),
     # "min_df": 0,
