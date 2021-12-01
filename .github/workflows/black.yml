@@ -8,11 +8,13 @@ jobs:
         with:  # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
             ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v1
-      - run: pip install black
-      - run: black --check .
+      - run: |
+          pip install black
+          pip install pylint
       - name: If needed, commit black changes to a new pull request
         if: failure()
         run: |
+          pylint .
           black .
           git config --global user.name github-actions
           git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
