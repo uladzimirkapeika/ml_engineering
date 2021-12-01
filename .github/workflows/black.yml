@@ -13,13 +13,12 @@ jobs:
       - name: Install Pylint
         run: pip install pylint
       - name: Run Pylint
-        runt: pylint .
+        run: pylint .
       - name: Run black --check .
         run: black --check .
       - name: If needed, commit black changes to the pull request
         if: failure()
         run: |
-          pylint .
           black .
           git config --global user.name github-actions
           git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
