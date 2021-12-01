@@ -1,11 +1,13 @@
 name: data_governance
-on: [push]
+on: [push, pull_request]
 jobs:
   run:
     runs-on: [ubuntu-latest]
     container: docker://dvcorg/cml-py3:latest
     steps:
       - uses: actions/checkout@v2
+      - with:
+          python-version: 3.7
       - name: cml_run
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -14,9 +16,8 @@ jobs:
           cd data_governance_hw
           pwd
           pip install -r requirements.txt
-          black --check .
-          black .
           pylint **/*.py
+          python -m black .
           dvc pull train.csv
           pytest tests.py
           dvc repro
