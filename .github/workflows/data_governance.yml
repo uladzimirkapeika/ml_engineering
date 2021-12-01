@@ -14,7 +14,7 @@ jobs:
           cd data_governance_hw
           pwd
           pip install -r requirements.txt
-          dvc pull
+          dvc pull train.csv
           pytest tests.py
           dvc repro
           git fetch --prune
