@@ -12,10 +12,10 @@ from matplotlib import pyplot
 vectorizer_params = {
     "max_features": 200,
     # "max_features": None,
-     "ngram_range": (1, 2),
+    "ngram_range": (1, 2),
     # "min_df": 0,
     # "max_df": 100,
-     "use_idf": False,
+    "use_idf": False,
     # "decode_error": "replace",
     # "sublinear_tf": True,
     # "analyzer": "char"
