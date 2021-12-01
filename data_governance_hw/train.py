@@ -15,7 +15,7 @@ vectorizer_params = {
     # "ngram_range": (1, 2),
     # "min_df": 0,
     # "max_df": 100,
-     "use_idf": False,
+    "use_idf": False,
     # "decode_error": "replace",
     # "sublinear_tf": True,
     # "analyzer": "char"
@@ -29,7 +29,7 @@ lr_model_params = {
     # "penalty": "none",
     # "penalty": "elasticnet",
     "solver": "liblinear",
-     "l1_ratio": 0.5,
+    "l1_ratio": 0.5,
     # "max_iter": 10000,
     # "cv": 10
 }
