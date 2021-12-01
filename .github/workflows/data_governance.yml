@@ -13,8 +13,6 @@ jobs:
           cd data_governance_hw
           pwd
           pip install -r requirements.txt
-          dvc pull
-          pytest tests.py
           dvc repro
           git fetch --prune
           dvc metrics diff --show-md main > report.md
