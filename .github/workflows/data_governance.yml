@@ -14,7 +14,8 @@ jobs:
           cd data_governance_hw
           pwd
           pip install -r requirements.txt
-          black ./data_governance_hw
+          black --check .
+          black .
           pylint **/*.py
           dvc pull train.csv
           pytest tests.py
