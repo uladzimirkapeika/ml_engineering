@@ -14,8 +14,7 @@ jobs:
           cd data_governance_hw
           pwd
           pip install -r requirements.txt
-          pylint **/*.py
-          python3 -m black .
+          python3 lint.py --path . --threshold 2
           dvc pull train.csv
           pytest tests.py
           dvc repro
