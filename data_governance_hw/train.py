@@ -10,9 +10,9 @@ from matplotlib import pyplot
 
 
 vectorizer_params = {
-    "max_features": 300,
+    "max_features": 200,
     # "max_features": None,
-    # "ngram_range": (1, 2),
+     "ngram_range": (1, 2),
     # "min_df": 0,
     # "max_df": 100,
      "use_idf": False,
@@ -29,7 +29,7 @@ lr_model_params = {
     # "penalty": "none",
     # "penalty": "elasticnet",
     "solver": "liblinear",
-     "l1_ratio": 0.5,
+    # "l1_ratio": 0.5,
     # "max_iter": 10000,
     # "cv": 10
 }
