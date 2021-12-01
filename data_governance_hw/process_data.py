@@ -2,8 +2,8 @@ import pandas as pd
 import string
 import nltk
 
-nltk.download('punkt')
-nltk.download('stopwords')
+nltk.download("punkt")
+nltk.download("stopwords")
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -19,8 +19,8 @@ def tokenize_sentence(sentence: str, remove_stop_words: bool = True):
     return " ".join(tokens)
 
 
-df_train = pd.read_csv('train.csv', sep=",")
+df_train = pd.read_csv("train.csv", sep=",")
 snowball = SnowballStemmer(language="english")
 
-df_train['text'] = df_train['text'].apply(tokenize_sentence)
-df_train.to_csv('data_processed_train.csv')
+df_train["text"] = df_train["text"].apply(tokenize_sentence)
+df_train.to_csv("data_processed_train.csv")
