@@ -21,5 +21,4 @@ jobs:
           dvc metrics diff --show-md main > report.md
           # Add figure to the report
           echo "## Validating results by region"
-          cml-publish 'permutate_feature_importance_top_10.png --md >> report.md
           cml-send-comment report.md
