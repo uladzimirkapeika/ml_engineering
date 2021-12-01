@@ -1,6 +1,6 @@
 import argparse
 import logging
-from lint.lint import Run
+from pylint.lint import Run
 
 
 logging.getLogger().setLevel(logging.INFO)
