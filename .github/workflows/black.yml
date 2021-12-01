@@ -13,7 +13,7 @@ jobs:
       - name: Install Pylint
         run: pip install pylint
       - name: Run Pylint
-        run: pylint .
+        run: pylint *.py
       - name: Run black --check .
         run: black --check .
       - name: If needed, commit black changes to the pull request
