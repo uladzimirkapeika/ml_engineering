@@ -5,3 +5,5 @@ seaborn
 numpy
 matplotlib
 pytest
+black
+pylint
