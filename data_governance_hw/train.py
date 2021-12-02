@@ -15,7 +15,7 @@ vectorizer_params = {
     "ngram_range": (1, 2),
     # "min_df": 0,
     # "max_df": 100,
-    "use_idf": False,
+    "use_idf": True,
     # "decode_error": "replace",
     # "sublinear_tf": True,
     # "analyzer": "char"
