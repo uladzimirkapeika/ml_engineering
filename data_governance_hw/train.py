@@ -31,7 +31,7 @@ def prepare_data(df):
 
 def train_model(X, y):
     """Train model and calculate cross validation predictions"""
-    model = RandomForestClassifier(max_depth=2, random_state=0)
+    model = RandomForestClassifier(max_depth=5, random_state=0)
     y_pred = cross_val_predict(model, X, y, cv=5)
     model.fit(X, y)
     return model, y_pred

@@ -12,7 +12,7 @@ jobs:
         run: pip install -r data_governance_hw/requirements.txt
       - name: Run Pylint
         run: pylint $(git ls-files '*.py') --fail-under=5
-      - name: Run black --check .
+      - name: Run black
         run: black --check .
       - name: If needed, commit black changes to the pull request
         if: failure()
