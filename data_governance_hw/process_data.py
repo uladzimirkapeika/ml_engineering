@@ -1,16 +1,20 @@
-import pandas as pd
 import string
+import pandas as pd
 import nltk
-
-nltk.download("punkt")
-nltk.download("stopwords")
-
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import SnowballStemmer
+nltk.download("punkt")
+nltk.download("stopwords")
 
 
 def tokenize_sentence(sentence: str, remove_stop_words: bool = True):
+    """
+    Clean text data
+    :param sentence: raw text
+    :param remove_stop_words: boolean flag specifying if stop words have to be removed
+    :return: cleaned text
+    """
     tokens = word_tokenize(sentence, language="english")
     tokens = [i for i in tokens if i not in string.punctuation]
     if remove_stop_words:
