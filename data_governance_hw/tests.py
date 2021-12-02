@@ -2,8 +2,8 @@ import string
 import time
 import pickle
 import pandas as pd
-import train
 import process_data
+import train
 
 
 def test_input_data_shape():

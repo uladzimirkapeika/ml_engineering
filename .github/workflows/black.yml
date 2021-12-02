@@ -8,10 +8,8 @@ jobs:
         with:  # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
             ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v1
-      - name: Install Black
-        run: pip install black
-      - name: Install Pylint
-        run: pip install pylint
+      - name: Install libraries
+        run: pip install -r data_governance_hw/requirements.txt
       - name: Run Pylint
         run: pylint $(git ls-files '*.py') --fail-under=5
       - name: Run black --check .
