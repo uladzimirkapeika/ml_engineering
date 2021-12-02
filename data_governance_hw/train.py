@@ -53,9 +53,7 @@ def calculate_metrics(y_pred, y_train):
 def calculate_permute_importance(model, X, y):
     """Calculate permute importance"""
     model.fit(X, y)
-    results = permutation_importance(
-        model, X.toarray(), y, scoring="accuracy"
-    )
+    results = permutation_importance(model, X.toarray(), y, scoring="accuracy")
     importance = results.importances_mean
 
     return importance
@@ -75,5 +73,7 @@ with open("metrics.json", "w") as outfile:
     )
 permutate_importance = calculate_permute_importance(final_model, X_train, y_train)
 
-ax = pyplot.bar(list(range(len(permutate_importance[0:10]))), permutate_importance[0:10])
+ax = pyplot.bar(
+    list(range(len(permutate_importance[0:10]))), permutate_importance[0:10]
+)
 pyplot.savefig("permutate_feature_importance_top_10.png", dpi=80)

@@ -7,7 +7,7 @@ import train
 
 
 def test_input_data_shape():
-    """ Check input data: shape, length of text and class balance"""
+    """Check input data: shape, length of text and class balance"""
     df_train = pd.read_csv("train.csv", sep=",")
     assert df_train.shape[0] > 0
     assert df_train.shape[1] > 0
@@ -18,7 +18,7 @@ def test_input_data_shape():
 
 
 def test_cleaning_text_function():
-    """ Test the funcion for cleaning raw text"""
+    """Test the funcion for cleaning raw text"""
     test1 = """My cousin in Trinidad won’t get the vaccine cuz his friend got it & became crazy.
         His friend was weeks away from getting married, now the girl called off the wedding.
         So just pray on it & make sure you’re comfortable with ur decision, not bullied"""
@@ -28,7 +28,7 @@ def test_cleaning_text_function():
 
 
 def test_processed_data_for_training_purposes():
-    """ Test processed data. It should not contain empty text"""
+    """Test processed data. It should not contain empty text"""
     df_train = pd.read_csv("train.csv", sep=",")
     df_train["text"] = df_train["text"].apply(process_data.tokenize_sentence)
     df_train.to_csv("data_processed_train.csv")
