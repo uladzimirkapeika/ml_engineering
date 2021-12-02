@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 
 vectorizer_params = {
-    "max_features": 220,
+    "max_features": 350,
     "ngram_range": (1, 2),
     "use_idf": True,
 }
