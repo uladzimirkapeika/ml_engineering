@@ -10,7 +10,6 @@ from sklearn.inspection import permutation_importance
 from sklearn.ensemble import RandomForestClassifier
 
 
-
 vectorizer_params = {
     "max_features": 220,
     "ngram_range": (1, 2),
@@ -70,10 +69,11 @@ with open("metrics.json", "w") as outfile:
 permutate_importance = calculate_permute_importance(final_model, X_train, y_train)
 ind = np.argpartition(permutate_importance, -10)[-10:]
 top_10_words = np.array(vectorizer.get_feature_names())[ind]
-sns.set(rc={'figure.figsize':(18, 12)})
-ax = sns.barplot(x=top_10_words, y=permutate_importance[ind],
-            label='Total', color='b', edgecolor='w')
-ax.tick_params(axis='x', rotation=45)
-ax.set(xlabel='Word', ylabel='Permutate importance')
-sns.set_color_codes('muted')
+sns.set(rc={"figure.figsize": (18, 12)})
+ax = sns.barplot(
+    x=top_10_words, y=permutate_importance[ind], label="Total", color="b", edgecolor="w"
+)
+ax.tick_params(axis="x", rotation=45)
+ax.set(xlabel="Word", ylabel="Permutate importance")
+sns.set_color_codes("muted")
 ax.figure.savefig("permutate_feature_importance_top_10.png", dpi=80)
