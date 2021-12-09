@@ -13,6 +13,7 @@ jobs:
         run: |
           cd data_governance_hw
           pwd
+          pip install --upgrade pip
           pip install -r requirements.txt
           dvc pull train.csv
           pytest tests.py
