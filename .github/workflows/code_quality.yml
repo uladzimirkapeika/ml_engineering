@@ -8,6 +8,8 @@ jobs:
         with:  # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
             ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v1
+      - name: Upgrade pip
+        run: pip install --upgrade pip
       - name: Install libraries
         run: pip install -r data_governance_hw/requirements.txt
       - name: Run Pylint
