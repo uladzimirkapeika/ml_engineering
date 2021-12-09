@@ -12,10 +12,6 @@ jobs:
         run: pip install --upgrade pip
       - name: Install libraries
         run: pip install -r data_governance_hw/requirements.txt
-      - name: abcd
-        run: pip list
-      - name: abcde
-        run: python3 --version
       - name: Run Pylint
         run: pylint $(git ls-files '*.py') --fail-under=5
       - name: Run black
