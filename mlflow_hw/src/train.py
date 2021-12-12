@@ -21,9 +21,9 @@ import os
 import pickle
 from mlflow.tracking import MlflowClient
 
-os.environ['HYPEROPT_FMIN_SEED'] = "2"
+os.environ["HYPEROPT_FMIN_SEED"] = "2"
 
-mlflow.set_tracking_uri('http://localhost:5000')
+mlflow.set_tracking_uri("http://localhost:5000")
 
 
 def calculate_metrics(y_pred, y_train):
@@ -40,36 +40,38 @@ y_train = df_train["target"]
 vectorizer = TfidfVectorizer(max_features=50)
 features = vectorizer.fit_transform(df_train["text"])
 
-search_space = hp.choice('classifier_type', [
-    {
-        'type': 'svm',
-        'C': hp.lognormal('SVM_C', 0, 1.0),
-        'kernel': hp.choice('kernel', ['linear', 'rbf'])
-    },
-    {
-        'type': 'rf',
-        'max_depth': hp.quniform('max_depth', 2, 5, 1),
-        'criterion': hp.choice('criterion', ['gini', 'entropy'])
-    },
-    {
-        'type': 'logreg',
-        'C': hp.lognormal('LR_C', 0, 0.5),
-        'solver': hp.choice('solver', ['liblinear', 'lbfgs'])
-    },
-])
-
+search_space = hp.choice(
+    "classifier_type",
+    [
+        {
+            "type": "svm",
+            "C": hp.lognormal("SVM_C", 0, 1.0),
+            "kernel": hp.choice("kernel", ["linear", "rbf"]),
+        },
+        {
+            "type": "rf",
+            "max_depth": hp.quniform("max_depth", 2, 5, 1),
+            "criterion": hp.choice("criterion", ["gini", "entropy"]),
+        },
+        {
+            "type": "logreg",
+            "C": hp.lognormal("LR_C", 0, 0.5),
+            "solver": hp.choice("solver", ["liblinear", "lbfgs"]),
+        },
+    ],
+)
 
 
 def objective(params):
-    classifier_type = params['type']
-    del params['type']
-    if classifier_type == 'svm':
+    classifier_type = params["type"]
+    del params["type"]
+    if classifier_type == "svm":
         clf = SVC(**params)
-    elif classifier_type == 'rf':
+    elif classifier_type == "rf":
         clf = RandomForestClassifier(**params)
-    elif classifier_type == 'logreg':
+    elif classifier_type == "logreg":
         clf = LogisticRegression(**params)
-    params['model'] = classifier_type
+    params["model"] = classifier_type
     y_pred = cross_val_predict(clf, features, y_train)
     acc, spec, sens = calculate_metrics(y_pred, y_train)
     with mlflow.start_run(nested=True):
@@ -78,40 +80,36 @@ def objective(params):
         mlflow.log_metric("specificity", spec)
         mlflow.log_metric("sensitivity", sens)
 
-    return {'loss': -acc, 'status': STATUS_OK}
+    return {"loss": -acc, "status": STATUS_OK}
 
 
 trials = Trials()
-best_result = fmin(
-    fn=objective,
-    space=search_space,
-    max_evals=2,
-    trials=trials)
+best_result = fmin(fn=objective, space=search_space, max_evals=2, trials=trials)
 print(best_result)
 print(space_eval(search_space, best_result))
 
 params = space_eval(search_space, best_result)
-classifier_type = params['type']
-del params['type']
-if classifier_type == 'svm':
+classifier_type = params["type"]
+del params["type"]
+if classifier_type == "svm":
     clf = SVC(**params)
-elif classifier_type == 'rf':
+elif classifier_type == "rf":
     clf = RandomForestClassifier(**params)
-elif classifier_type == 'logreg':
+elif classifier_type == "logreg":
     clf = LogisticRegression(**params)
-params['model'] = classifier_type
+params["model"] = classifier_type
 model = clf.fit(features, y_train)
 
 
 with mlflow.start_run() as run:
     mlflow.log_params(best_result)
-    #pickle.dump(model, open('best_model.pkl', 'wb'))
-    #pickle.dump(vectorizer, open('best_model_vectorizer.pkl', 'wb'))
-    print('LOG THE BEST MODEL')
+    # pickle.dump(model, open('best_model.pkl', 'wb'))
+    # pickle.dump(vectorizer, open('best_model_vectorizer.pkl', 'wb'))
+    print("LOG THE BEST MODEL")
     mlflow.sklearn.log_model(model, "model")
     mlflow.sklearn.log_model(vectorizer, "vectorizer")
-    #mlflow.log_artifact('best_model.pkl')
-    #mlflow.log_artifact('best_model_vectorizer.pkl')
+    # mlflow.log_artifact('best_model.pkl')
+    # mlflow.log_artifact('best_model_vectorizer.pkl')
 
 client = MlflowClient()
 local_dir = "volume/artifact_downloads"
