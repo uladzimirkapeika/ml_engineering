@@ -1,0 +1,13 @@
+sklearn
+pandas
+nltk
+seaborn
+numpy
+matplotlib
+pytest
+click
+black==20.8b0
+pylint
+mlflow
+hyperopt
+boto3

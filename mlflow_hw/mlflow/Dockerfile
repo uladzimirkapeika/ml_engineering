@@ -1,0 +1,13 @@
+FROM python:3.7-slim
+
+RUN pip install mlflow[extras] && \
+    pip install boto3 && \
+    pip install awscli
+
+EXPOSE 5000
+
+RUN addgroup --gid $GROUP_ID user \
+  && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+USER user
+
+CMD mlflow server --backend-store-uri volume/meta --default-artifact-root volume/artifact --host 0.0.0.0 --port 5000
