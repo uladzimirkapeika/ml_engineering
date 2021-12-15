@@ -2,28 +2,22 @@ version: "3.9"
 
 services:
   server:
-    restart: always
     build: mlflow/
     ports:
-      - 5000:5000
+      - 7777:7777
     volumes:
-      - ./volume:/volume
-    environment:
-      #- AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      #- AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      #- AWS_DEFAULT_REGION=eu-central-1
+      - vol:/volume
+
   client:
-    restart: always
-    build: client/
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile
     volumes:
       - ./src:/src
-      - ./volume:/volume
+      - vol:/volume
     network_mode: host
-    environment:
-      #- AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      #- AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      #- AWS_DEFAULT_REGION=eu-central-1
     depends_on:
       - server
+
 volumes:
-  volume:
+     vol:

@@ -21,9 +21,8 @@ import os
 import pickle
 from mlflow.tracking import MlflowClient
 
-os.environ['HYPEROPT_FMIN_SEED'] = "2"
-
-mlflow.set_tracking_uri('http://localhost:5000')
+#os.environ['HYPEROPT_FMIN_SEED'] = "1"
+mlflow.set_tracking_uri('http://localhost:7777')
 
 
 def calculate_metrics(y_pred, y_train):
@@ -34,8 +33,16 @@ def calculate_metrics(y_pred, y_train):
     sens = tp / (tp + fn)
     return acc, spec, sens
 
+client = MlflowClient()
+experiment_id = client.create_experiment('Test N1')
+experiment = client.get_experiment(experiment_id)
+print("Name: {}".format(experiment.name))
+print("Experiment_id: {}".format(experiment.experiment_id))
+print("Artifact Location: {}".format(experiment.artifact_location))
+print("Tags: {}".format(experiment.tags))
+print("Lifecycle_stage: {}".format(experiment.lifecycle_stage))
 
-df_train = pd.read_csv("src/data_processed_train.csv")
+df_train = pd.read_csv("data_processed_train.csv")
 y_train = df_train["target"]
 vectorizer = TfidfVectorizer(max_features=50)
 features = vectorizer.fit_transform(df_train["text"])
@@ -59,7 +66,6 @@ search_space = hp.choice('classifier_type', [
 ])
 
 
-
 def objective(params):
     classifier_type = params['type']
     del params['type']
@@ -72,23 +78,18 @@ def objective(params):
     params['model'] = classifier_type
     y_pred = cross_val_predict(clf, features, y_train)
     acc, spec, sens = calculate_metrics(y_pred, y_train)
-    with mlflow.start_run(nested=True):
+    with mlflow.start_run(experiment_id=experiment_id, nested=True) as run:
         mlflow.log_params(params)
         mlflow.log_metric("accuracy", acc)
         mlflow.log_metric("specificity", spec)
         mlflow.log_metric("sensitivity", sens)
-
     return {'loss': -acc, 'status': STATUS_OK}
 
 
-trials = Trials()
 best_result = fmin(
     fn=objective,
     space=search_space,
-    max_evals=2,
-    trials=trials)
-print(best_result)
-print(space_eval(search_space, best_result))
+    max_evals=3)
 
 params = space_eval(search_space, best_result)
 classifier_type = params['type']
@@ -100,23 +101,25 @@ elif classifier_type == 'rf':
 elif classifier_type == 'logreg':
     clf = LogisticRegression(**params)
 params['model'] = classifier_type
+
+y_pred = cross_val_predict(clf, features, y_train)
+acc, spec, sens = calculate_metrics(y_pred, y_train)
+
 model = clf.fit(features, y_train)
+params['model'] = classifier_type
 
-
-with mlflow.start_run() as run:
+with mlflow.start_run(experiment_id=experiment_id, run_name='best_model') as run:
+    mlflow.log_metric("accuracy", acc)
+    mlflow.log_metric("specificity", spec)
+    mlflow.log_metric("sensitivity", sens)
     mlflow.log_params(best_result)
-    #pickle.dump(model, open('best_model.pkl', 'wb'))
-    #pickle.dump(vectorizer, open('best_model_vectorizer.pkl', 'wb'))
-    print('LOG THE BEST MODEL')
-    mlflow.sklearn.log_model(model, "model")
-    mlflow.sklearn.log_model(vectorizer, "vectorizer")
-    #mlflow.log_artifact('best_model.pkl')
-    #mlflow.log_artifact('best_model_vectorizer.pkl')
+    mlflow.sklearn.log_model(model, "best_model")
+    mlflow.sklearn.log_model(vectorizer, "simple_vectorizer")
 
 client = MlflowClient()
-local_dir = "volume/artifact_downloads"
-if not os.path.exists(local_dir):
-    os.mkdir(local_dir)
-local_path = client.download_artifacts(run.info.run_id, "model", local_dir)
-print("Artifacts downloaded in: {}".format(local_path))
-print("Artifacts: {}".format(os.listdir(local_path)))
+#local_dir = "volume/artifact_downloads"
+#if not os.path.exists(local_dir):
+#    os.mkdir(local_dir)
+#local_path = client.download_artifacts(run.info.run_id, "model", local_dir)
+#print("Artifacts downloaded in: {}".format(local_path))
+#print("Artifacts: {}".format(os.listdir(local_path)))
