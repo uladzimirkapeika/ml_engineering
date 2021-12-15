@@ -21,8 +21,8 @@ import os
 import pickle
 from mlflow.tracking import MlflowClient
 
-#os.environ['HYPEROPT_FMIN_SEED'] = "1"
-mlflow.set_tracking_uri('http://localhost:7777')
+# os.environ['HYPEROPT_FMIN_SEED'] = "1"
+mlflow.set_tracking_uri("http://localhost:7777")
 
 
 def calculate_metrics(y_pred, y_train):
@@ -33,8 +33,9 @@ def calculate_metrics(y_pred, y_train):
     sens = tp / (tp + fn)
     return acc, spec, sens
 
+
 client = MlflowClient()
-experiment_id = client.create_experiment('Test N1')
+experiment_id = client.create_experiment("Test N1")
 experiment = client.get_experiment(experiment_id)
 print("Name: {}".format(experiment.name))
 print("Experiment_id: {}".format(experiment.experiment_id))
@@ -47,35 +48,38 @@ y_train = df_train["target"]
 vectorizer = TfidfVectorizer(max_features=50)
 features = vectorizer.fit_transform(df_train["text"])
 
-search_space = hp.choice('classifier_type', [
-    {
-        'type': 'svm',
-        'C': hp.lognormal('SVM_C', 0, 1.0),
-        'kernel': hp.choice('kernel', ['linear', 'rbf'])
-    },
-    {
-        'type': 'rf',
-        'max_depth': hp.quniform('max_depth', 2, 5, 1),
-        'criterion': hp.choice('criterion', ['gini', 'entropy'])
-    },
-    {
-        'type': 'logreg',
-        'C': hp.lognormal('LR_C', 0, 0.5),
-        'solver': hp.choice('solver', ['liblinear', 'lbfgs'])
-    },
-])
+search_space = hp.choice(
+    "classifier_type",
+    [
+        {
+            "type": "svm",
+            "C": hp.lognormal("SVM_C", 0, 1.0),
+            "kernel": hp.choice("kernel", ["linear", "rbf"]),
+        },
+        {
+            "type": "rf",
+            "max_depth": hp.quniform("max_depth", 2, 5, 1),
+            "criterion": hp.choice("criterion", ["gini", "entropy"]),
+        },
+        {
+            "type": "logreg",
+            "C": hp.lognormal("LR_C", 0, 0.5),
+            "solver": hp.choice("solver", ["liblinear", "lbfgs"]),
+        },
+    ],
+)
 
 
 def objective(params):
-    classifier_type = params['type']
-    del params['type']
-    if classifier_type == 'svm':
+    classifier_type = params["type"]
+    del params["type"]
+    if classifier_type == "svm":
         clf = SVC(**params)
-    elif classifier_type == 'rf':
+    elif classifier_type == "rf":
         clf = RandomForestClassifier(**params)
-    elif classifier_type == 'logreg':
+    elif classifier_type == "logreg":
         clf = LogisticRegression(**params)
-    params['model'] = classifier_type
+    params["model"] = classifier_type
     y_pred = cross_val_predict(clf, features, y_train)
     acc, spec, sens = calculate_metrics(y_pred, y_train)
     with mlflow.start_run(experiment_id=experiment_id, nested=True) as run:
@@ -83,32 +87,29 @@ def objective(params):
         mlflow.log_metric("accuracy", acc)
         mlflow.log_metric("specificity", spec)
         mlflow.log_metric("sensitivity", sens)
-    return {'loss': -acc, 'status': STATUS_OK}
+    return {"loss": -acc, "status": STATUS_OK}
 
 
-best_result = fmin(
-    fn=objective,
-    space=search_space,
-    max_evals=3)
+best_result = fmin(fn=objective, space=search_space, max_evals=3)
 
 params = space_eval(search_space, best_result)
-classifier_type = params['type']
-del params['type']
-if classifier_type == 'svm':
+classifier_type = params["type"]
+del params["type"]
+if classifier_type == "svm":
     clf = SVC(**params)
-elif classifier_type == 'rf':
+elif classifier_type == "rf":
     clf = RandomForestClassifier(**params)
-elif classifier_type == 'logreg':
+elif classifier_type == "logreg":
     clf = LogisticRegression(**params)
-params['model'] = classifier_type
+params["model"] = classifier_type
 
 y_pred = cross_val_predict(clf, features, y_train)
 acc, spec, sens = calculate_metrics(y_pred, y_train)
 
 model = clf.fit(features, y_train)
-params['model'] = classifier_type
+params["model"] = classifier_type
 
-with mlflow.start_run(experiment_id=experiment_id, run_name='best_model') as run:
+with mlflow.start_run(experiment_id=experiment_id, run_name="best_model") as run:
     mlflow.log_metric("accuracy", acc)
     mlflow.log_metric("specificity", spec)
     mlflow.log_metric("sensitivity", sens)
@@ -117,9 +118,9 @@ with mlflow.start_run(experiment_id=experiment_id, run_name='best_model') as run
     mlflow.sklearn.log_model(vectorizer, "simple_vectorizer")
 
 client = MlflowClient()
-#local_dir = "volume/artifact_downloads"
-#if not os.path.exists(local_dir):
+# local_dir = "volume/artifact_downloads"
+# if not os.path.exists(local_dir):
 #    os.mkdir(local_dir)
-#local_path = client.download_artifacts(run.info.run_id, "model", local_dir)
-#print("Artifacts downloaded in: {}".format(local_path))
-#print("Artifacts: {}".format(os.listdir(local_path)))
+# local_path = client.download_artifacts(run.info.run_id, "model", local_dir)
+# print("Artifacts downloaded in: {}".format(local_path))
+# print("Artifacts: {}".format(os.listdir(local_path)))
