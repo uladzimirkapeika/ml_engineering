@@ -11,9 +11,9 @@ from hyperopt import fmin, hp, STATUS_OK, space_eval
 import mlflow
 import mlflow.sklearn
 
-os.environ['HYPEROPT_FMIN_SEED'] = "1"
-SERVICE_NAME = 'server'
-mlflow.set_tracking_uri(f'http://{SERVICE_NAME}:7777')
+os.environ["HYPEROPT_FMIN_SEED"] = "1"
+SERVICE_NAME = "server"
+mlflow.set_tracking_uri(f"http://{SERVICE_NAME}:7777")
 
 
 def calculate_metrics(y_pred, y_train):
@@ -30,69 +30,71 @@ y_train = df_train["target"]
 vectorizer = TfidfVectorizer(max_features=50)
 features = vectorizer.fit_transform(df_train["text"])
 
-search_space = hp.choice('classifier_type', [
-    {
-        'type': 'svm',
-        'C': hp.lognormal('SVM_C', 0, 1.0),
-        'kernel': hp.choice('kernel', ['linear', 'rbf'])
-    },
-    {
-        'type': 'rf',
-        'max_depth': hp.quniform('max_depth', 2, 5, 1),
-        'criterion': hp.choice('criterion', ['gini', 'entropy'])
-    },
-    {
-        'type': 'logreg',
-        'C': hp.lognormal('LR_C', 0, 0.5),
-        'solver': hp.choice('solver', ['liblinear', 'lbfgs'])
-    },
-])
+search_space = hp.choice(
+    "classifier_type",
+    [
+        {
+            "type": "svm",
+            "C": hp.lognormal("SVM_C", 0, 1.0),
+            "kernel": hp.choice("kernel", ["linear", "rbf"]),
+        },
+        {
+            "type": "rf",
+            "max_depth": hp.quniform("max_depth", 2, 5, 1),
+            "criterion": hp.choice("criterion", ["gini", "entropy"]),
+        },
+        {
+            "type": "logreg",
+            "C": hp.lognormal("LR_C", 0, 0.5),
+            "solver": hp.choice("solver", ["liblinear", "lbfgs"]),
+        },
+    ],
+)
 
 
 def objective(params):
     """Objective function for hyperopt"""
-    classifier_type = params['type']
-    del params['type']
-    if classifier_type == 'svm':
+    classifier_type = params["type"]
+    del params["type"]
+    if classifier_type == "svm":
         clf = SVC(**params)
-    elif classifier_type == 'rf':
+    elif classifier_type == "rf":
         clf = RandomForestClassifier(**params)
-    elif classifier_type == 'logreg':
+    elif classifier_type == "logreg":
         clf = LogisticRegression(**params)
-    params['model'] = classifier_type
+    params["model"] = classifier_type
     y_pred = cross_val_predict(clf, features, y_train)
     acc, spec, sens = calculate_metrics(y_pred, y_train)
-    mlflow.set_experiment('Model_selection')
+    mlflow.set_experiment("Model_selection")
     with mlflow.start_run():
         mlflow.log_params(params)
         mlflow.log_metric("accuracy", acc)
         mlflow.log_metric("specificity", spec)
         mlflow.log_metric("sensitivity", sens)
-    return {'loss': -acc, 'status': STATUS_OK}
+    return {"loss": -acc, "status": STATUS_OK}
 
 
-best_result = fmin(
-    fn=objective,
-    space=search_space,
-    max_evals=30)
+best_result = fmin(fn=objective, space=search_space, max_evals=30)
 
 params = space_eval(search_space, best_result)
-classifier_type_best_model = params['type']
-del params['type']
-if classifier_type_best_model == 'svm':
+classifier_type_best_model = params["type"]
+del params["type"]
+if classifier_type_best_model == "svm":
     clf_best_model = SVC(**params)
-elif classifier_type_best_model == 'rf':
+elif classifier_type_best_model == "rf":
     clf_best_model = RandomForestClassifier(**params)
-elif classifier_type_best_model == 'logreg':
+elif classifier_type_best_model == "logreg":
     clf_best_model = LogisticRegression(**params)
-params['model'] = classifier_type_best_model
+params["model"] = classifier_type_best_model
 
 y_pred_best_model = cross_val_predict(clf_best_model, features, y_train)
-acc_best_model, spec_best_model, sens_best_model = calculate_metrics(y_pred_best_model, y_train)
+acc_best_model, spec_best_model, sens_best_model = calculate_metrics(
+    y_pred_best_model, y_train
+)
 
 model = clf_best_model.fit(features, y_train)
 
-mlflow.set_experiment('Best_model')
+mlflow.set_experiment("Best_model")
 with mlflow.start_run():
     mlflow.log_metric("accuracy", acc_best_model)
     mlflow.log_metric("specificity", spec_best_model)
