@@ -2,7 +2,6 @@ FROM python:3.7-slim
 COPY requirements.txt ./
 RUN apt-get update && pip install --requirement requirements.txt
 
-
 ARG USER_ID
 ARG GROUP_ID
 
