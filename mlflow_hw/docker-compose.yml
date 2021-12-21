@@ -2,22 +2,24 @@ version: "3.9"
 
 services:
   server:
-    build: mlflow/
+    build: 
+      context: ./mlflow/
+      dockerfile: Dockerfile
     ports:
       - 7777:7777
+    expose: 
+      - 7777  
     volumes:
-      - vol:/volume
-
+      - ./volume:/home/new_user/volume
+    command: bash -c "cd volume && mlflow server --host 0.0.0.0:7777" 
+    restart: on-failure
   client:
     build:
-      context: ./
-      dockerfile: ./client/Dockerfile
+      context: ./client/
+      dockerfile: Dockerfile
     volumes:
-      - ./src:/src
-      - vol:/volume
-    network_mode: host
+      - ./volume:/home/new_user/volume
     depends_on:
       - server
+    command: bash -c "export GIT_PYTHON_REFRESH=quiet && cd volume && python src/train.py"  
 
-volumes:
-     vol:

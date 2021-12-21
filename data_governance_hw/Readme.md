@@ -9,7 +9,7 @@ DVC pipeline specified in dvc.yaml. At the end several files are generated:
 
 Reproduce pipeline with this command:
 
-    dvc repo
+    dvc repro
 
 Link to the Google Drive:
 

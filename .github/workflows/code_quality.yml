@@ -11,7 +11,7 @@ jobs:
       - name: Upgrade pip
         run: pip install --upgrade pip
       - name: Install libraries
-        run: pip install -r data_governance_hw/requirements.txt
+        run: pip install -r mlflow_hw/client/requirements.txt
       - name: Run Pylint
         run: pylint $(git ls-files '*.py') --fail-under=5
       - name: Run black
