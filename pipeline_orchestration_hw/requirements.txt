@@ -1,0 +1,5 @@
+pandas
+numpy
+dask==2021.8.0
+vaderSentiment
+kaggle

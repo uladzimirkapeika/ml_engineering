@@ -1,0 +1,5 @@
+cd '/opt/airflow/data/'
+rm 'twitter_training.csv'
+rm 'twitter_validation.csv'
+rm 'temp_train.csv'
+rm 'temp_test.csv'
